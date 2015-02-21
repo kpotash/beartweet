@@ -4,6 +4,7 @@ import twitter
 import random
 import time
 import datetime
+#import pytz
 
 import getopt
 
@@ -111,7 +112,21 @@ PICS = [
     , 'pic.twitter.com/p6gkmwDLRe'
     , 'pic.twitter.com/MVc6nZZgRS'
     , 'pic.twitter.com/K8g6x9tlDp'
-    ]
+    , 'pic.twitter.com/MlhX4RFZ7t'
+    , 'pic.twitter.com/JaxImjeP9U'
+    , 'pic.twitter.com/ADSWEvK1wf'
+    , 'pic.twitter.com/bFEIQwfo06'
+    , 'pic.twitter.com/az6OMmudR1'
+    , 'pic.twitter.com/9AcZfgpEuP'
+    , 'pic.twitter.com/q0oo71HbV3'
+    , 'pic.twitter.com/x4soRIxOxV'
+    , 'pic.twitter.com/EyFLUMAMD5'
+    , 'pic.twitter.com/kwQM5mWTEQ'
+    , 'pic.twitter.com/Itn9lnghzL'
+    , 'pic.twitter.com/n8iJlhfKWM'
+    , 'pic.twitter.com/Gg1ejd2ZOK'
+    , 'pic.twitter.com/ArQciBVdpt'
+]
 
 def generate_key():
     handles = ' '.join(random.sample(THANDLES, 4))
@@ -130,11 +145,30 @@ def modifyLine(line, sentTweets):
 
     return None
 
+class EST(datetime.tzinfo): 
+    def utcoffset(self,dt): 
+        #5 hours behind  GMT 
+        return datetime.timedelta(hours=-5,minutes=0) 
+    def tzname(self,dt): 
+        return "GMT -5" 
+    def dst(self,dt): 
+        return datetime.timedelta(0) 
+
 def runtweets(api, tweets, sleep, delay):
     sentTweets = set([])
     lastResetTime = datetime.datetime.now()
+
     while True:
         nowTime = datetime.datetime.now()
+        localTime = nowTime + datetime.timedelta(hours=-5) # dumb way to get EST
+        localHour = localTime.time().hour
+
+        if localHour > 19 or localHour < 7:
+            print 'Not tweeting at hour: {0}'.format(localHour)
+            sys.stdout.flush()
+            time.sleep(60)
+            continue
+
         runTime = nowTime - lastResetTime
         if runTime.total_seconds() > 24*60*60:
             lastResetTime = nowTime
