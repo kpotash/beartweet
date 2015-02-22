@@ -162,6 +162,8 @@ def runtweets(api, tweets, sleep, delay):
         nowTime = datetime.datetime.now()
         localTime = nowTime + datetime.timedelta(hours=-5) # dumb way to get EST
         localHour = localTime.time().hour
+        sleepTime = 4*sleep if nowTime.date().isoweekday() > 5 else sleep # tweet less often on weekends
+        print 'sleepTime is {0}'.format(sleepTime)
 
         if localHour > 19 or localHour < 7:
             print 'Not tweeting at hour: {0}'.format(localHour)
@@ -178,7 +180,7 @@ def runtweets(api, tweets, sleep, delay):
         for line in tweets:
             if not line:
                 continue
-            time.sleep(sleep + random.randint(0, delay))
+            time.sleep(sleepTime + random.randint(0, delay))
             tweetLine = modifyLine(line, sentTweets)
             if tweetLine:
                 try:
